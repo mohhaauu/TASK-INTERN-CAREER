@@ -12,36 +12,43 @@ public class Task
     }
 
     // Getters and Setters
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
 
-    public Date getDueDate() {
+    public Date getDueDate()
+    {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(Date dueDate)
+    {
         this.dueDate = dueDate;
     }
 
-    public boolean isCompleted() {
+    public boolean isCompleted()
+    {
         return isCompleted;
     }
 
-    public void setCompleted(boolean isCompleted) {
+    public void setCompleted(boolean isCompleted)
+    {
         this.isCompleted = isCompleted;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "Task{" +
-                "description='" + description + '\'' +
-                ", dueDate=" + dueDate +
-                ", isCompleted=" + isCompleted +
+                "description ='" + description + '\'' +
+                ", dueDate =" + dueDate +
+                ", isCompleted =" + isCompleted +
                 '}';
     }
 }
