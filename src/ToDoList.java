@@ -1,25 +1,31 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
+
 public class ToDoList
 {
     private final List<Task> tasks;
 
-    public ToDoList() {
+    public ToDoList()
+    {
         tasks = new ArrayList<>();
     }
 
-    public void addTask(Task task) {
+    public void addTask(Task task)
+    {
         tasks.add(task);
     }
 
-    public void viewTasks() {
-        for (Task task : tasks) {
+    public void viewTasks()
+    {
+        for (Task task : tasks)
+        {
             System.out.println(task);
         }
     }
 
-    public void editTask(int index, String newDescription, Date newDueDate) {
+    public void updateTask(int index, String newDescription, LocalDate newDueDate)
+    {
         Task task = tasks.get(index);
         task.setDescription(newDescription);
         task.setDueDate(newDueDate);

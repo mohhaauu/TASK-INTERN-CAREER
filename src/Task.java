@@ -1,54 +1,63 @@
-import java.util.Date;
+import java.time.LocalDate;
+
 public class Task
 {
+    private int id;
     private String description;
-    private Date dueDate;
+    private LocalDate dueDate;
     private boolean isCompleted;
 
-    public Task(String description, Date dueDate) {
+    // Constructors, getters, and setters
+
+    public Task(int id, String description, LocalDate dueDate, boolean isCompleted) {
+        this.id = id;
         this.description = description;
         this.dueDate = dueDate;
-        this.isCompleted = false;
-    }
-
-    // Getters and Setters
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
-    public Date getDueDate()
-    {
-        return dueDate;
-    }
-
-    public void setDueDate(Date dueDate)
-    {
-        this.dueDate = dueDate;
-    }
-
-    public boolean isCompleted()
-    {
-        return isCompleted;
-    }
-
-    public void setCompleted(boolean isCompleted)
-    {
         this.isCompleted = isCompleted;
     }
 
+    // default constructor?
+    public Task(String description, LocalDate dueDate, boolean isCompleted) {
+        this(-1, description, dueDate, isCompleted);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.isCompleted = completed;
+    }
+
     @Override
-    public String toString()
-    {
-        return "Task{" +
-                "description ='" + description + '\'' +
-                ", dueDate =" + dueDate +
-                ", isCompleted =" + isCompleted +
-                '}';
+    public String toString() {
+        return "task id: " + getId()  +
+                "\ndescription: " + getDescription() +
+                "\ndue date: " + getDueDate() +
+                "\nisCompleted:" + isCompleted();
     }
 }
