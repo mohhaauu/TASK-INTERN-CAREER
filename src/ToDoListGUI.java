@@ -111,6 +111,7 @@ public class ToDoListGUI extends Application {
             }
         });
 
+
         listView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 descriptionField.setText(newSelection.getDescription());

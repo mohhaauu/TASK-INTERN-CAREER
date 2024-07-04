@@ -19,45 +19,52 @@ public class Task
     // default constructor.
     public Task(String description, LocalDate dueDate, boolean isCompleted)
     {
-        this.description = description;
-        this.dueDate = dueDate;
-        this.isCompleted = isCompleted;
+        this(-1, description, dueDate, isCompleted);
     }
 
-    public int getId() {
+    public int getId()
+    {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(int id)
+    {
         this.id = id;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
 
-    public LocalDate getDueDate() {
+    public LocalDate getDueDate()
+    {
         return dueDate;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(LocalDate dueDate)
+    {
         this.dueDate = dueDate;
     }
 
-    public boolean isCompleted() {
+    public boolean isCompleted()
+    {
         return isCompleted;
     }
 
-    public void setCompleted(boolean completed) {
+    public void setCompleted(boolean completed)
+    {
         this.isCompleted = completed;
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "task id: " + getId()  +
                 "\ndescription: " + getDescription() +
                 "\ndue date: " + getDueDate() +

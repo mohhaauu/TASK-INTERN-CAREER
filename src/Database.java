@@ -43,7 +43,7 @@ public class Database
         try (Connection conn = getConnection(); PreparedStatement prepStatement = conn.prepareStatement(query);
              ResultSet rs = prepStatement.executeQuery()) {
             while (rs.next()) {
-                Task task = new Task(rs.getString("description"),
+                Task task = new Task(rs.getInt("task_id"),rs.getString("description"),
                         rs.getDate("due_date").toLocalDate(),
                         rs.getBoolean("completed")
                 );
@@ -53,9 +53,8 @@ public class Database
         return tasks;
     }
 
-    public static void updateTask(Task task) throws SQLException
-    {
-        String query = "UPDATE tasks SET description = " + task.getDescription() + "WHERE task_id = " + task.getId();
+    public static void updateTask(Task task) throws SQLException {
+        String query = "UPDATE tasks SET description = ?, due_date = ?, completed = ? WHERE task_id = ?";
         try (Connection conn = getConnection(); PreparedStatement prepStatement = conn.prepareStatement(query)) {
             prepStatement.setString(1, task.getDescription());
             prepStatement.setDate(2, java.sql.Date.valueOf(task.getDueDate()));
@@ -65,9 +64,10 @@ public class Database
         }
     }
 
+
     public static void deleteTask(Task task) throws SQLException
     {
-        String query = "DELETE FROM tasks WHERE task_id = " + task.getId();
+        String query = "DELETE FROM tasks WHERE task_id = ?";
         try (Connection conn = getConnection(); PreparedStatement prepStatement = conn.prepareStatement(query)) {
             prepStatement.setInt(1, task.getId());
             prepStatement.executeUpdate();
