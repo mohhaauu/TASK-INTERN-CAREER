@@ -16,9 +16,12 @@ public class Task
         this.isCompleted = isCompleted;
     }
 
-    // default constructor?
-    public Task(String description, LocalDate dueDate, boolean isCompleted) {
-        this(-1, description, dueDate, isCompleted);
+    // default constructor.
+    public Task(String description, LocalDate dueDate, boolean isCompleted)
+    {
+        this.description = description;
+        this.dueDate = dueDate;
+        this.isCompleted = isCompleted;
     }
 
     public int getId() {
@@ -58,6 +61,6 @@ public class Task
         return "task id: " + getId()  +
                 "\ndescription: " + getDescription() +
                 "\ndue date: " + getDueDate() +
-                "\nisCompleted:" + isCompleted();
+                "\nCompleted:" + isCompleted();
     }
 }

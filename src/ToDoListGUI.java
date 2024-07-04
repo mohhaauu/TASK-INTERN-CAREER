@@ -10,10 +10,11 @@ import java.time.LocalDate;
 
 public class ToDoListGUI extends Application {
     private final ObservableList<Task> tasks = FXCollections.observableArrayList();
+    //private TableView<Task> table;
 
     @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("To-Do List Application");
+    public void start(Stage primeStage) {
+        primeStage.setTitle("To-Do List Application");
 
         VBox vbox = new VBox();
         vbox.setSpacing(10);
@@ -24,15 +25,29 @@ public class ToDoListGUI extends Application {
         DatePicker dueDatePicker = new DatePicker();
         CheckBox completedCheckBox = new CheckBox("Completed");
 
+        Button viewButton = new Button("View Task");
         Button addButton = new Button("Add Task");
-        Button editButton = new Button("Edit Task");
+        Button updateButton = new Button("Edit Task");
         Button deleteButton = new Button("Delete Task");
         Button markCompletedButton = new Button("Mark Task as Completed");
 
-        vbox.getChildren().addAll(listView, descriptionField, dueDatePicker, completedCheckBox, addButton, editButton, deleteButton, markCompletedButton);
+        vbox.getChildren().addAll(listView, descriptionField, dueDatePicker, completedCheckBox, viewButton, addButton,
+                updateButton, deleteButton, markCompletedButton);
 
-        addButton.setOnAction(e ->
-        {
+        // Clear the listView at the start
+        tasks.clear();
+
+        viewButton.setOnAction(e -> {
+            try {
+                tasks.clear();
+                tasks.addAll(Database.getTasks());
+                listView.setItems(tasks);
+            } catch (SQLException ex) {
+                showAlert("Error fetching tasks: " + ex.getMessage());
+            }
+        });
+
+        addButton.setOnAction(e -> {
             String description = descriptionField.getText();
             LocalDate dueDate = dueDatePicker.getValue();
             boolean isCompleted = completedCheckBox.isSelected();
@@ -40,7 +55,6 @@ public class ToDoListGUI extends Application {
                 Task task = new Task(description, dueDate, isCompleted);
                 try {
                     Database.addTask(task);
-                    tasks.add(task);
                     clearFields(descriptionField, dueDatePicker, completedCheckBox);
                 } catch (SQLException ex) {
                     showAlert("Error adding task: " + ex.getMessage());
@@ -50,7 +64,7 @@ public class ToDoListGUI extends Application {
             }
         });
 
-        editButton.setOnAction(e -> {
+        updateButton.setOnAction(e -> {
             Task selectedTask = listView.getSelectionModel().getSelectedItem();
             if (selectedTask != null) {
                 selectedTask.setDescription(descriptionField.getText());
@@ -74,8 +88,7 @@ public class ToDoListGUI extends Application {
                 try {
                     Database.deleteTask(selectedTask);
                     tasks.remove(selectedTask);
-                } catch (SQLException ex)
-                {
+                } catch (SQLException ex) {
                     showAlert("Error deleting task: " + ex.getMessage());
                 }
             } else {
@@ -90,8 +103,7 @@ public class ToDoListGUI extends Application {
                 try {
                     Database.updateTask(selectedTask);
                     listView.refresh();
-                } catch (SQLException ex)
-                {
+                } catch (SQLException ex) {
                     showAlert("Error marking task as completed: " + ex.getMessage());
                 }
             } else {
@@ -107,27 +119,18 @@ public class ToDoListGUI extends Application {
             }
         });
 
-        // Load tasks from database on startup
-        try {
-            tasks.addAll(Database.getTasks());
-        } catch (SQLException ex) {
-            showAlert("Error loading tasks: " + ex.getMessage());
-        }
-
         Scene scene = new Scene(vbox, 600, 500);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        primeStage.setScene(scene);
+        primeStage.show();
     }
 
-    private void clearFields(TextField descriptionField, DatePicker dueDatePicker, CheckBox completedCheckBox)
-    {
+    private void clearFields(TextField descriptionField, DatePicker dueDatePicker, CheckBox completedCheckBox) {
         descriptionField.clear();
         dueDatePicker.setValue(null);
         completedCheckBox.setSelected(false);
     }
 
-    private void showAlert(String message)
-    {
+    private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Task Details");
         alert.setHeaderText(null);
@@ -135,8 +138,7 @@ public class ToDoListGUI extends Application {
         alert.showAndWait();
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         launch(args);
     }
 }

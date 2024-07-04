@@ -3,6 +3,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,14 +17,22 @@ public class Database
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    public static void addTask(Task task) throws SQLException {
-        String query = "INSERT INTO tasks (description, due_date, Completed) " +
-                        "VALUES ('{description}',{dueDate},{isCompleted})";
-        try (Connection conn = getConnection(); PreparedStatement prepStatement = conn.prepareStatement(query)) {
+    public static void addTask(Task task) throws SQLException
+    {
+        String query = "INSERT INTO tasks (description, due_date, completed) VALUES (?,?,?)";
+        try (Connection conn = getConnection(); PreparedStatement prepStatement = conn.prepareStatement(query,
+                Statement.RETURN_GENERATED_KEYS))
+        {
             prepStatement.setString(1, task.getDescription());
             prepStatement.setDate(2, java.sql.Date.valueOf(task.getDueDate()));
             prepStatement.setBoolean(3, task.isCompleted());
             prepStatement.executeUpdate();
+
+            try (ResultSet generatedKeys = prepStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    task.setId(generatedKeys.getInt(1)); // Update task object with the generated ID
+                }
+            }
         }
     }
 
@@ -31,13 +40,12 @@ public class Database
     {
         List<Task> tasks = new ArrayList<>();
         String query = "SELECT * FROM tasks";
-        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = getConnection(); PreparedStatement prepStatement = conn.prepareStatement(query);
+             ResultSet rs = prepStatement.executeQuery()) {
             while (rs.next()) {
-                Task task = new Task(
-                        rs.getString("description"),
+                Task task = new Task(rs.getString("description"),
                         rs.getDate("due_date").toLocalDate(),
-                        rs.getBoolean("is_completed")
+                        rs.getBoolean("completed")
                 );
                 tasks.add(task);
             }
