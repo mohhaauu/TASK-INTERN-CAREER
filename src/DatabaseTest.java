@@ -10,7 +10,8 @@ import static org.junit.Assert.*;
  * This class contains JUnit tests for the {@link Database} class.
  * It tests the methods for adding, retrieving, updating, and deleting tasks from the database.
  */
-public class DatabaseTest {
+public class DatabaseTest
+{
 
     /**
      * Sets up the database before any tests run by clearing the tasks table.
@@ -19,7 +20,8 @@ public class DatabaseTest {
      * @throws SQLException if a database access error occurs.
      */
     @BeforeClass
-    public static void setupDatabase() throws SQLException {
+    public static void setupDatabase() throws SQLException
+    {
         Database.clearTasksTable();
     }
 
@@ -30,7 +32,8 @@ public class DatabaseTest {
      * @throws SQLException if a database access error occurs.
      */
     @Before
-    public void clearDatabase() throws SQLException {
+    public void clearDatabase() throws SQLException
+    {
         Database.clearTasksTable();
     }
 
@@ -41,12 +44,13 @@ public class DatabaseTest {
      * @throws SQLException if a database access error occurs.
      */
     @Test
-    public void testAddTask() throws SQLException {
+    public void testAddTask() throws SQLException
+    {
         Task task = new Task("Test Task", LocalDate.now(), false);
         Database.addTask(task);
         List<Task> tasks = Database.getTasks();
         assertEquals(1, tasks.size());
-        assertEquals("Test Task", tasks.get(0).getDescription());
+        assertEquals("Test Task", tasks.getFirst().getDescription());
     }
 
     /**
@@ -56,7 +60,8 @@ public class DatabaseTest {
      * @throws SQLException if a database access error occurs.
      */
     @Test
-    public void testGetTasks() throws SQLException {
+    public void testGetTasks() throws SQLException
+    {
         Task task1 = new Task("Test Task 1", LocalDate.now(), false);
         Task task2 = new Task("Test Task 2", LocalDate.now().plusDays(1), true);
         Database.addTask(task1);
@@ -72,13 +77,14 @@ public class DatabaseTest {
      * @throws SQLException if a database access error occurs.
      */
     @Test
-    public void testUpdateTask() throws SQLException {
+    public void testUpdateTask() throws SQLException
+    {
         Task task = new Task("Test Task", LocalDate.now(), false);
         Database.addTask(task);
         task.setDescription("Updated Task");
         Database.updateTask(task);
         List<Task> tasks = Database.getTasks();
-        assertEquals("Updated Task", tasks.get(0).getDescription());
+        assertEquals("Updated Task", tasks.getFirst().getDescription());
     }
 
     /**
@@ -88,7 +94,8 @@ public class DatabaseTest {
      * @throws SQLException if a database access error occurs.
      */
     @Test
-    public void testDeleteTask() throws SQLException {
+    public void testDeleteTask() throws SQLException
+    {
         Task task = new Task("Test Task", LocalDate.now(), false);
         Database.addTask(task);
         Database.deleteTask(task);

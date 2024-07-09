@@ -3,7 +3,8 @@ import java.time.LocalDate;
 /**
  * Represents a task with a description, due date, and completion status.
  */
-public class Task {
+public class Task
+{
     // Private fields for task attributes
     private int id;
     private String description;
@@ -18,7 +19,8 @@ public class Task {
      * @param dueDate     the due date of the task
      * @param isCompleted the completion status of the task
      */
-    public Task(int id, String description, LocalDate dueDate, boolean isCompleted) {
+    public Task(int id, String description, LocalDate dueDate, boolean isCompleted)
+    {
         this.id = id;
         this.description = description;
         this.dueDate = dueDate;
@@ -33,7 +35,8 @@ public class Task {
      * @param dueDate     the due date of the task
      * @param isCompleted the completion status of the task
      */
-    public Task(String description, LocalDate dueDate, boolean isCompleted) {
+    public Task(String description, LocalDate dueDate, boolean isCompleted)
+    {
         this(-1, description, dueDate, isCompleted); // Calls the other constructor with a default ID of -1
     }
 
@@ -42,7 +45,8 @@ public class Task {
      *
      * @return the ID of the task
      */
-    public int getId() {
+    public int getId()
+    {
         return id;
     }
 
@@ -51,7 +55,8 @@ public class Task {
      *
      * @param id the ID to set
      */
-    public void setId(int id) {
+    public void setId(int id)
+    {
         this.id = id;
     }
 
@@ -60,7 +65,8 @@ public class Task {
      *
      * @return the description of the task
      */
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
@@ -69,7 +75,8 @@ public class Task {
      *
      * @param description the description to set
      */
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
 
@@ -78,7 +85,8 @@ public class Task {
      *
      * @return the due date of the task
      */
-    public LocalDate getDueDate() {
+    public LocalDate getDueDate()
+    {
         return dueDate;
     }
 
@@ -87,7 +95,8 @@ public class Task {
      *
      * @param dueDate the due date to set
      */
-    public void setDueDate(LocalDate dueDate) {
+    public void setDueDate(LocalDate dueDate)
+    {
         this.dueDate = dueDate;
     }
 
@@ -96,7 +105,8 @@ public class Task {
      *
      * @return {@code true} if the task is completed, {@code false} otherwise
      */
-    public boolean isCompleted() {
+    public boolean isCompleted()
+    {
         return isCompleted;
     }
 
@@ -105,7 +115,8 @@ public class Task {
      *
      * @param completed the completion status to set
      */
-    public void setCompleted(boolean completed) {
+    public void setCompleted(boolean completed)
+    {
         this.isCompleted = completed;
     }
 
@@ -115,10 +126,11 @@ public class Task {
      * @return a string representation of the task
      */
     @Override
-    public String toString() {
+    public String toString()
+    {
         return "task id: " + getId() +
-                "\ndescription: " + getDescription() +
-                "\ndue date: " + getDueDate() +
+                "\nDescription: " + getDescription() +
+                "\nDue date: " + getDueDate() +
                 "\nCompleted:" + isCompleted();
     }
 }

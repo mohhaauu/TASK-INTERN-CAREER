@@ -7,7 +7,8 @@ import static org.junit.Assert.*;
  * This class contains JUnit tests for the {@link Task} class.
  * It tests the getter and setter methods as well as the {@code toString} method of the {@link Task} class.
  */
-public class TestApp {
+public class TestApp
+{
 
     private Task task;
 
@@ -16,7 +17,8 @@ public class TestApp {
      * This method is run before each test.
      */
     @Before
-    public void setUp() {
+    public void setUp()
+    {
         task = new Task(1, "Test Task", LocalDate.of(2023, 7, 1), false);
     }
 
@@ -25,7 +27,8 @@ public class TestApp {
      * Ensures that the ID of the task is retrieved correctly.
      */
     @Test
-    public void testGetId() {
+    public void testGetId()
+    {
         assertEquals(1, task.getId());
     }
 
@@ -34,7 +37,8 @@ public class TestApp {
      * Ensures that the ID of the task is set correctly.
      */
     @Test
-    public void testSetId() {
+    public void testSetId()
+    {
         task.setId(2);
         assertEquals(2, task.getId());
     }
@@ -44,7 +48,8 @@ public class TestApp {
      * Ensures that the description of the task is retrieved correctly.
      */
     @Test
-    public void testGetDescription() {
+    public void testGetDescription()
+    {
         assertEquals("Test Task", task.getDescription());
     }
 
@@ -53,7 +58,8 @@ public class TestApp {
      * Ensures that the description of the task is set correctly.
      */
     @Test
-    public void testSetDescription() {
+    public void testSetDescription()
+    {
         task.setDescription("Updated Task");
         assertEquals("Updated Task", task.getDescription());
     }
@@ -63,7 +69,8 @@ public class TestApp {
      * Ensures that the due date of the task is retrieved correctly.
      */
     @Test
-    public void testGetDueDate() {
+    public void testGetDueDate()
+    {
         assertEquals(LocalDate.of(2023, 7, 1), task.getDueDate());
     }
 
@@ -72,7 +79,8 @@ public class TestApp {
      * Ensures that the due date of the task is set correctly.
      */
     @Test
-    public void testSetDueDate() {
+    public void testSetDueDate()
+    {
         LocalDate newDate = LocalDate.of(2023, 8, 1);
         task.setDueDate(newDate);
         assertEquals(newDate, task.getDueDate());
@@ -83,7 +91,8 @@ public class TestApp {
      * Ensures that the completion status of the task is retrieved correctly.
      */
     @Test
-    public void testIsCompleted() {
+    public void testIsCompleted()
+    {
         assertFalse(task.isCompleted());
     }
 
@@ -92,7 +101,8 @@ public class TestApp {
      * Ensures that the completion status of the task is set correctly.
      */
     @Test
-    public void testSetCompleted() {
+    public void testSetCompleted()
+    {
         task.setCompleted(true);
         assertTrue(task.isCompleted());
     }
@@ -102,8 +112,9 @@ public class TestApp {
      * Ensures that the string representation of the task is generated correctly.
      */
     @Test
-    public void testToString() {
-        String expectedString = "task id: 1\ndescription: Test Task\ndue date: 2023-07-01\nCompleted:false";
+    public void testToString()
+    {
+        String expectedString = "task id: 1\nDescription: Test Task\nDue date: 2023-07-01\nCompleted:false";
         assertEquals(expectedString, task.toString());
     }
 }
