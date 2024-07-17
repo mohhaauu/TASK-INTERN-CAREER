@@ -16,18 +16,17 @@ public class Database
                             "VALUES (?, ?, ?, ?, 'Student', ?)";
         String studentQuery = "INSERT INTO students (user_id, year_of_study, major) VALUES (?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement userStmt = conn.prepareStatement(userQuery, PreparedStatement.RETURN_GENERATED_KEYS);
-             PreparedStatement studentStmt = conn.prepareStatement(studentQuery))
-        {
+             PreparedStatement userStmt = conn.prepareStatement(userQuery, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement studentStmt = conn.prepareStatement(studentQuery)) {
             userStmt.setString(1, student.getFirstName());
             userStmt.setString(2, student.getLastName());
             userStmt.setString(3, student.getEmail());
             userStmt.setString(4, student.getPassword());
             userStmt.setString(5, student.getUsername());
             userStmt.executeUpdate();
+
             ResultSet rs = userStmt.getGeneratedKeys();
-            if (rs.next())
-            {
+            if (rs.next()) {
                 int userId = rs.getInt(1);
                 studentStmt.setInt(1, userId);
                 studentStmt.setInt(2, student.getYearOfStudy());
@@ -41,7 +40,7 @@ public class Database
         String userQuery = "INSERT INTO users (first_name, last_name, email, password, role, username) VALUES (?, ?, ?, ?, 'Teacher', ?)";
         String teacherQuery = "INSERT INTO teachers (user_id, department, years_of_experience) VALUES (?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement userStmt = conn.prepareStatement(userQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+             PreparedStatement userStmt = conn.prepareStatement(userQuery, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement teacherStmt = conn.prepareStatement(teacherQuery)) {
             userStmt.setString(1, teacher.getFirstName());
             userStmt.setString(2, teacher.getLastName());
@@ -49,6 +48,7 @@ public class Database
             userStmt.setString(4, teacher.getPassword());
             userStmt.setString(5, teacher.getUsername());
             userStmt.executeUpdate();
+
             ResultSet rs = userStmt.getGeneratedKeys();
             if (rs.next()) {
                 int userId = rs.getInt(1);
@@ -60,14 +60,31 @@ public class Database
         }
     }
 
-    public static boolean authenticateUser(String username, String password) throws SQLException {
+    public static boolean authenticateUser(String username, String password) throws SQLException
+    {
         String query = "SELECT * FROM users WHERE username = ? AND password = ?";
         try (Connection conn = getConnection();
-             PreparedStatement prepStatement = conn.prepareStatement(query)) {
+             PreparedStatement prepStatement = conn.prepareStatement(query))
+        {
             prepStatement.setString(1, username);
             prepStatement.setString(2, password);
             ResultSet resultSet = prepStatement.executeQuery();
             return resultSet.next();
         }
     }
+
+    public static String getUserRole(String username) throws SQLException {
+        String query = "SELECT role FROM users WHERE username = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement prepStatement = conn.prepareStatement(query)) {
+            prepStatement.setString(1, username);
+            ResultSet resultSet = prepStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("role");
+            } else {
+                throw new SQLException("User role not found.");
+            }
+        }
+    }
+
 }
