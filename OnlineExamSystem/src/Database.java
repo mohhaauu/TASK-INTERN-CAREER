@@ -1,8 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class Database
 {
@@ -11,41 +7,56 @@ public class Database
     private static final String USER = "root";
     private static final String PASSWORD = "K@yl13n!07LGD";
 
-    public static Connection getConnection() throws SQLException
-    {
+    public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    // Add the methods to insert Student and Teacher into the database
     public static void addStudent(Student student) throws SQLException {
-        String query = "INSERT INTO users (first_name, last_name, email, password, role, username," +
-                        " year_of_study, major) VALUES (?, ?, ?, ?, 'Student', ?, ?, ?)";
+        String userQuery = "INSERT INTO users (first_name, last_name, email, password, role, username) " +
+                            "VALUES (?, ?, ?, ?, 'Student', ?)";
+        String studentQuery = "INSERT INTO students (user_id, year_of_study, major) VALUES (?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement prepStatement = conn.prepareStatement(query)) {
-            prepStatement.setString(1, student.getFirstName());
-            prepStatement.setString(2, student.getLastName());
-            prepStatement.setString(3, student.getEmail());
-            prepStatement.setString(4, student.getPassword());
-            prepStatement.setString(5, student.getUsername());
-            prepStatement.setInt(6, student.getYearOfStudy());
-            prepStatement.setString(7, student.getMajor());
-            prepStatement.executeUpdate();
+             PreparedStatement userStmt = conn.prepareStatement(userQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+             PreparedStatement studentStmt = conn.prepareStatement(studentQuery))
+        {
+            userStmt.setString(1, student.getFirstName());
+            userStmt.setString(2, student.getLastName());
+            userStmt.setString(3, student.getEmail());
+            userStmt.setString(4, student.getPassword());
+            userStmt.setString(5, student.getUsername());
+            userStmt.executeUpdate();
+            ResultSet rs = userStmt.getGeneratedKeys();
+            if (rs.next())
+            {
+                int userId = rs.getInt(1);
+                studentStmt.setInt(1, userId);
+                studentStmt.setInt(2, student.getYearOfStudy());
+                studentStmt.setString(3, student.getMajor());
+                studentStmt.executeUpdate();
+            }
         }
     }
 
     public static void addTeacher(Teacher teacher) throws SQLException {
-        String query = "INSERT INTO users (first_name, last_name, email, password, role, username, " +
-                        "department, years_of_experience) VALUES (?, ?, ?, ?, 'Teacher', ?, ?, ?)";
+        String userQuery = "INSERT INTO users (first_name, last_name, email, password, role, username) VALUES (?, ?, ?, ?, 'Teacher', ?)";
+        String teacherQuery = "INSERT INTO teachers (user_id, department, years_of_experience) VALUES (?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement prepStatement = conn.prepareStatement(query)) {
-            prepStatement.setString(1, teacher.getFirstName());
-            prepStatement.setString(2, teacher.getLastName());
-            prepStatement.setString(3, teacher.getEmail());
-            prepStatement.setString(4, teacher.getPassword());
-            prepStatement.setString(5, teacher.getUsername());
-            prepStatement.setString(6, teacher.getDepartment());
-            prepStatement.setInt(7, teacher.getYearsOfExperience());
-            prepStatement.executeUpdate();
+             PreparedStatement userStmt = conn.prepareStatement(userQuery, PreparedStatement.RETURN_GENERATED_KEYS);
+             PreparedStatement teacherStmt = conn.prepareStatement(teacherQuery)) {
+            userStmt.setString(1, teacher.getFirstName());
+            userStmt.setString(2, teacher.getLastName());
+            userStmt.setString(3, teacher.getEmail());
+            userStmt.setString(4, teacher.getPassword());
+            userStmt.setString(5, teacher.getUsername());
+            userStmt.executeUpdate();
+            ResultSet rs = userStmt.getGeneratedKeys();
+            if (rs.next()) {
+                int userId = rs.getInt(1);
+                teacherStmt.setInt(1, userId);
+                teacherStmt.setString(2, teacher.getDepartment());
+                teacherStmt.setInt(3, teacher.getYearsOfExperience());
+                teacherStmt.executeUpdate();
+            }
         }
     }
 

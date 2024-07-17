@@ -3,6 +3,7 @@ public class Teacher extends User
     private String department;
     private int yearsOfExperience;
 
+    // default constructor
     public Teacher(int id, String firstName, String lastName, String email, String password,
                    String department, int yearsOfExperience)
     {
@@ -11,7 +12,17 @@ public class Teacher extends User
         this.yearsOfExperience = yearsOfExperience;
     }
 
-    // Getters and setters
+    // constructor without id
+    public Teacher(String firstName, String lastName, String email, String password,
+                   String username, String department, int yearsOfExperience)
+    {
+        super(0, firstName, lastName, email, password);
+        this.setUsername(username);
+        this.department = department;
+        this.yearsOfExperience = yearsOfExperience;
+    }
+
+// Getters and setters
     public void setDepartment(String department)
     {
         this.department = department;

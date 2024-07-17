@@ -1,17 +1,27 @@
 public class Student extends User
 {
     private int yearOfStudy;
-    private String major;
+    private  String major;
 
+    // default constructor
     public Student(int id, String firstName, String lastName, String email, String password,
-                   int yearOfStudy, String major)
-    {
+                   int yearOfStudy, String major) {
         super(id, firstName, lastName, email, password);
         this.yearOfStudy = yearOfStudy;
         this.major = major;
     }
 
-    // Getters and setters
+    // constructor without id
+    public Student(String firstName, String lastName, String email, String password,
+                   String username, int yearOfStudy, String major) {
+        super(0, firstName, lastName, email, password);
+        this.setUsername(username);
+        this.yearOfStudy = yearOfStudy;
+        this.major = major;
+    }
+
+
+// Getters and setters
 
     public void setYearOfStudy(int yearOfStudy)
     {
