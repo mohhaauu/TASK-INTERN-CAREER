@@ -9,7 +9,8 @@ public class UserRegistrationGUI extends Application
 {
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         primaryStage.setTitle("User Registration");
 
         VBox vbox = new VBox();
@@ -68,6 +69,7 @@ public class UserRegistrationGUI extends Application
 
         Button registerButton = new Button("Register");
         Button loginButton = new Button("Login");
+
         vbox.getChildren().addAll(firstNameField, lastNameField, emailField, passwordField, confirmPasswordField,
                 roleComboBox, yearOfStudyField, majorField, departmentField, yearsOfExperienceField, registerButton,
                 loginButton);
@@ -96,7 +98,8 @@ public class UserRegistrationGUI extends Application
                         primaryStage.close();
                         LoginGUI loginGUI = new LoginGUI();
                         loginGUI.start(new Stage());
-                    } catch (SQLException ex) {
+                    } catch (SQLException ex)
+                    {
                         showAlert("Error during registration: " + ex.getMessage());
                     }
                 } else if ("Teacher".equals(role)) {

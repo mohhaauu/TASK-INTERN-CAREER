@@ -1,5 +1,6 @@
 import java.sql.*;
-
+import java.util.ArrayList;
+import java.util.List;
 public class Database
 {
 
@@ -87,4 +88,18 @@ public class Database
         }
     }
 
+    public static List<String> getAvailableExams() throws SQLException {
+        String query = "SELECT exam_id, title FROM exams";
+        List<String> exams = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement prepStatement = conn.prepareStatement(query);
+             ResultSet resultSet = prepStatement.executeQuery()) {
+            while (resultSet.next()) {
+                int examId = resultSet.getInt("exam_id");
+                String title = resultSet.getString("title");
+                exams.add(examId + ": " + title);
+            }
+        }
+        return exams;
+    }
 }

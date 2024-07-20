@@ -33,8 +33,16 @@ public class LoginGUI extends Application
             try {
                 if (Database.authenticateUser(username, password)) {
                     showAlert("Login successful!");
-                    // after successful login, direct back to respective GUI access:
 
+                    String role = Database.getUserRole(username); // Get user role from the database
+                    if (role.equals("Student")) {
+                        ExamTaking examTaking = new ExamTaking(username);
+                        examTaking.start(new Stage());
+                    } else if (role.equals("Teacher")) {
+                        ExamCreation examCreation = new ExamCreation(username);
+                        examCreation.start(new Stage());
+                    }
+                    primaryStage.close();
                 } else {
                     showAlert("Invalid username or password.");
                 }
@@ -45,8 +53,7 @@ public class LoginGUI extends Application
 
         createAccountButton.setOnAction(e -> {
             UserRegistrationGUI registrationGUI = new UserRegistrationGUI();
-            try
-            {
+            try {
                 registrationGUI.start(new Stage());
                 primaryStage.close(); // Close the current login window
             } catch (Exception ex) {
@@ -59,8 +66,7 @@ public class LoginGUI extends Application
         primaryStage.show();
     }
 
-    private void showAlert(String message)
-    {
+    private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Login Info");
         alert.setHeaderText(null);
@@ -68,8 +74,7 @@ public class LoginGUI extends Application
         alert.showAndWait();
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         launch(args);
     }
 }
