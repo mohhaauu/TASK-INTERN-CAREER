@@ -1,134 +1,146 @@
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
-public class UserRegistrationGUI extends Application
-{
+public class UserRegistrationGUI extends Application {
 
     @Override
-    public void start(Stage primaryStage)
-    {
+    public void start(Stage primaryStage) {
         primaryStage.setTitle("User Registration");
 
-        VBox vbox = new VBox();
-        vbox.setSpacing(10);
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setVgap(8);
+        grid.setHgap(10);
 
-        // UI components for registration
-        TextField firstNameField = new TextField();
-        firstNameField.setPromptText("First Name");
+        Label firstNameLabel = new Label("First Name:");
+        GridPane.setConstraints(firstNameLabel, 0, 0);
+        TextField firstNameInput = new TextField();
+        GridPane.setConstraints(firstNameInput, 1, 0);
 
-        TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Last Name");
+        Label lastNameLabel = new Label("Last Name:");
+        GridPane.setConstraints(lastNameLabel, 0, 1);
+        TextField lastNameInput = new TextField();
+        GridPane.setConstraints(lastNameInput, 1, 1);
 
-        TextField emailField = new TextField();
-        emailField.setPromptText("Email");
+        Label emailLabel = new Label("Email:");
+        GridPane.setConstraints(emailLabel, 0, 2);
+        TextField emailInput = new TextField();
+        GridPane.setConstraints(emailInput, 1, 2);
 
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
+        Label passwordLabel = new Label("Password:");
+        GridPane.setConstraints(passwordLabel, 0, 3);
+        PasswordField passwordInput = new PasswordField();
+        GridPane.setConstraints(passwordInput, 1, 3);
 
-        PasswordField confirmPasswordField = new PasswordField();
-        confirmPasswordField.setPromptText("Confirm Password");
+        Label roleLabel = new Label("Role:");
+        GridPane.setConstraints(roleLabel, 0, 4);
+        ChoiceBox<String> roleChoiceBox = new ChoiceBox<>();
+        roleChoiceBox.getItems().addAll("student", "teacher");
+        GridPane.setConstraints(roleChoiceBox, 1, 4);
 
-        ComboBox<String> roleComboBox = new ComboBox<>();
-        roleComboBox.getItems().addAll("Student", "Teacher");
-        roleComboBox.setPromptText("Role");
+        // Additional fields for students
+        Label yearOfStudyLabel = new Label("Year of Study:");
+        GridPane.setConstraints(yearOfStudyLabel, 0, 5);
+        TextField yearOfStudyInput = new TextField();
+        GridPane.setConstraints(yearOfStudyInput, 1, 5);
 
-        TextField yearOfStudyField = new TextField();
-        yearOfStudyField.setPromptText("Year of Study");
-        yearOfStudyField.setVisible(false); // initially hidden
+        Label majorLabel = new Label("Major:");
+        GridPane.setConstraints(majorLabel, 0, 6);
+        TextField majorInput = new TextField();
+        GridPane.setConstraints(majorInput, 1, 6);
 
-        TextField majorField = new TextField();
-        majorField.setPromptText("Major");
-        majorField.setVisible(false); // initially hidden
+        // Additional fields for teachers
+        Label departmentLabel = new Label("Department:");
+        GridPane.setConstraints(departmentLabel, 0, 5);
+        TextField departmentInput = new TextField();
+        GridPane.setConstraints(departmentInput, 1, 5);
 
-        TextField departmentField = new TextField();
-        departmentField.setPromptText("Department");
-        departmentField.setVisible(false); // initially hidden
-
-        TextField yearsOfExperienceField = new TextField();
-        yearsOfExperienceField.setPromptText("Years of Experience");
-        yearsOfExperienceField.setVisible(false); // initially hidden
-
-        roleComboBox.setOnAction(e -> {
-            String role = roleComboBox.getValue();
-            if ("Student".equals(role)) {
-                yearOfStudyField.setVisible(true);
-                majorField.setVisible(true);
-                departmentField.setVisible(false);
-                yearsOfExperienceField.setVisible(false);
-            } else if ("Teacher".equals(role)) {
-                yearOfStudyField.setVisible(false);
-                majorField.setVisible(false);
-                departmentField.setVisible(true);
-                yearsOfExperienceField.setVisible(true);
-            }
-        });
+        Label yearsOfExperienceLabel = new Label("Years of Experience:");
+        GridPane.setConstraints(yearsOfExperienceLabel, 0, 6);
+        TextField yearsOfExperienceInput = new TextField();
+        GridPane.setConstraints(yearsOfExperienceInput, 1, 6);
 
         Button registerButton = new Button("Register");
-        Button loginButton = new Button("Login");
+        GridPane.setConstraints(registerButton, 1, 7);
 
-        vbox.getChildren().addAll(firstNameField, lastNameField, emailField, passwordField, confirmPasswordField,
-                roleComboBox, yearOfStudyField, majorField, departmentField, yearsOfExperienceField, registerButton,
-                loginButton);
-
-        loginButton.setOnAction(e -> {
-            LoginGUI loginGUI = new LoginGUI();
-            loginGUI.start(primaryStage);
-        });
         registerButton.setOnAction(e -> {
-            String firstName = firstNameField.getText();
-            String lastName = lastNameField.getText();
-            String email = emailField.getText();
-            String password = passwordField.getText();
-            String confirmPassword = confirmPasswordField.getText();
-            String role = roleComboBox.getValue();
-            String username = lastName + role + "@school.ac.za";
+            String firstName = firstNameInput.getText();
+            String lastName = lastNameInput.getText();
+            String email = emailInput.getText();
+            String password = passwordInput.getText();
+            String role = roleChoiceBox.getValue();
 
-            if (password.equals(confirmPassword)) {
-                if ("Student".equals(role)) {
-                    int yearOfStudy = Integer.parseInt(yearOfStudyField.getText());
-                    String major = majorField.getText();
-                    Student student = new Student(firstName, lastName, email, password, username, yearOfStudy, major);
-                    try {
-                        Database.addStudent(student);
-                        showAlert("Registration successful! Your username is: " + username);
-                        primaryStage.close();
-                        LoginGUI loginGUI = new LoginGUI();
-                        loginGUI.start(new Stage());
-                    } catch (SQLException ex)
-                    {
-                        showAlert("Error during registration: " + ex.getMessage());
+            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || role == null) {
+                showAlert(Alert.AlertType.ERROR, "Form Error!", "Please enter all fields");
+                return;
+            }
+
+            String username = lastName + firstName + role + "@school.ac.za";
+
+            try {
+                if (role.equals("student")) {
+                    String yearOfStudy = yearOfStudyInput.getText();
+                    String major = majorInput.getText();
+                    if (yearOfStudy.isEmpty() || major.isEmpty()) {
+                        showAlert(Alert.AlertType.ERROR, "Form Error!", "Please enter all fields for student");
+                        return;
                     }
-                } else if ("Teacher".equals(role)) {
-                    String department = departmentField.getText();
-                    int yearsOfExperience = Integer.parseInt(yearsOfExperienceField.getText());
-                    Teacher teacher = new Teacher(firstName, lastName, email, password, username, department, yearsOfExperience);
-                    try {
-                        Database.addTeacher(teacher);
-                        showAlert("Registration successful! Your username is: " + username);
-                        primaryStage.close();
-                        LoginGUI loginGUI = new LoginGUI();
-                        loginGUI.start(new Stage());
-                    } catch (SQLException ex) {
-                        showAlert("Error during registration: " + ex.getMessage());
+                    Student student = new Student(0, firstName, lastName, email, password,
+                            Integer.parseInt(yearOfStudy), major);
+                    Database.addUser(student, role);
+                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful!",
+                            "Welcome, " + student.getFirstName() + ". Use this username to log in the system: "
+                                    + username);
+                } else if (role.equals("teacher")) {
+                    String department = departmentInput.getText();
+                    String yearsOfExperience = yearsOfExperienceInput.getText();
+                    if (department.isEmpty() || yearsOfExperience.isEmpty()) {
+                        showAlert(Alert.AlertType.ERROR, "Form Error!",
+                                "Please enter all fields for teacher");
+                        return;
                     }
+                    Teacher teacher = new Teacher(0, firstName, lastName, email, password, department,
+                            Integer.parseInt(yearsOfExperience));
+                    Database.addUser(teacher, role);
+                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful!",
+                            "Welcome, " + teacher.getFirstName());
                 }
-            } else {
-                showAlert("Passwords do not match.");
+            } catch (SQLException ex) {
+                showAlert(Alert.AlertType.ERROR, "Registration Error!",
+                        "An error occurred: " + ex.getMessage());
             }
         });
 
-        Scene scene = new Scene(vbox, 400, 500);
+        grid.getChildren().addAll(firstNameLabel, firstNameInput, lastNameLabel, lastNameInput, emailLabel, emailInput, passwordLabel, passwordInput, roleLabel, roleChoiceBox, registerButton);
+
+        roleChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue.equals("student")) {
+                    grid.getChildren().removeAll(departmentLabel, departmentInput, yearsOfExperienceLabel, yearsOfExperienceInput);
+                    grid.getChildren().addAll(yearOfStudyLabel, yearOfStudyInput, majorLabel, majorInput);
+                } else if (newValue.equals("teacher")) {
+                    grid.getChildren().removeAll(yearOfStudyLabel, yearOfStudyInput, majorLabel, majorInput);
+                    grid.getChildren().addAll(departmentLabel, departmentInput, yearsOfExperienceLabel, yearsOfExperienceInput);
+                }
+            }
+        });
+
+        Scene scene = new Scene(grid, 400, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Registration Info");
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
