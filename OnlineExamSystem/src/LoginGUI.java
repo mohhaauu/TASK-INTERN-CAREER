@@ -1,74 +1,73 @@
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import java.sql.SQLException;
 
-public class LoginGUI extends Application
-{
+public class LoginGUI extends Application {
+
     @Override
-    public void start(Stage primaryStage)
-    {
-        primaryStage.setTitle("User Login");
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Login");
 
-        VBox vbox = new VBox();
-        vbox.setSpacing(10);
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        grid.setVgap(8);
+        grid.setHgap(10);
 
-        // UI components for login
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Username");
+        Label usernameLabel = new Label("Username:");
+        GridPane.setConstraints(usernameLabel, 0, 0);
+        TextField usernameInput = new TextField();
+        GridPane.setConstraints(usernameInput, 1, 0);
 
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
+        Label passwordLabel = new Label("Password:");
+        GridPane.setConstraints(passwordLabel, 0, 1);
+        PasswordField passwordInput = new PasswordField();
+        GridPane.setConstraints(passwordInput, 1, 1);
 
         Button loginButton = new Button("Login");
-        Button createAccountButton = new Button("Create Account");
-
-        vbox.getChildren().addAll(usernameField, passwordField, loginButton, createAccountButton);
+        GridPane.setConstraints(loginButton, 1, 2);
 
         loginButton.setOnAction(e -> {
-            String username = usernameField.getText();
-            String password = passwordField.getText();
+            String username = usernameInput.getText();
+            String password = passwordInput.getText();
+
+            if (username.isEmpty() || password.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Form Error!", "Please enter all fields");
+                return;
+            }
 
             try {
                 if (Database.authenticateUser(username, password)) {
-                    showAlert("Login successful!");
-
-                    String role = Database.getUserRole(username); // Get user role from the database
-                    if (role.equals("Student")) {
-                        ExamTaking examTaking = new ExamTaking(username);
-                        examTaking.start(new Stage());
-                    } else if (role.equals("Teacher")) {
-                        ExamCreation examCreation = new ExamCreation(username);
-                        examCreation.start(new Stage());
+                    User user = Database.getUserByUsername(username);
+                    if (user instanceof Student) {
+                        ExamTaking examTakingGUI = new ExamTaking((Student) user);
+                        examTakingGUI.start(new Stage());
+                    } else if (user instanceof Teacher) {
+                        ExamCreation examCreationGUI = new ExamCreation((Teacher) user);
+                        examCreationGUI.start(new Stage());
                     }
                     primaryStage.close();
                 } else {
-                    showAlert("Invalid username or password.");
+                    showAlert(Alert.AlertType.ERROR, "Login Failed!", "Invalid username or password");
                 }
-            } catch (Exception ex) {
-                showAlert("Error during login: " + ex.getMessage());
+            } catch (SQLException ex) {
+                showAlert(Alert.AlertType.ERROR, "Login Error!", "An error occurred: " + ex.getMessage());
             }
         });
 
-        createAccountButton.setOnAction(e -> {
-            UserRegistrationGUI registrationGUI = new UserRegistrationGUI();
-            try {
-                registrationGUI.start(new Stage());
-                primaryStage.close(); // Close the current login window
-            } catch (Exception ex) {
-                showAlert("Error opening registration: " + ex.getMessage());
-            }
-        });
+        grid.getChildren().addAll(usernameLabel, usernameInput, passwordLabel, passwordInput, loginButton);
 
-        Scene scene = new Scene(vbox, 400, 200);
+        Scene scene = new Scene(grid, 300, 200);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Login Info");
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
