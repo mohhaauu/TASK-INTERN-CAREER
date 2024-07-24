@@ -1,48 +1,31 @@
 public class Questions {
     private int id;
+    private int examId;
     private String questionText;
+    private int marks;
     private String correctAnswer;
-    private String type; // "multiple-choice", "true-false", "short-answer"
 
-    public Questions(int id, String questionText, String correctAnswer, String type)
-    {
+    // Constructor
+    public Questions(int examId, String questionText, String correctAnswer, int marks) {
+        this.examId = examId;
         this.questionText = questionText;
         this.correctAnswer = correctAnswer;
-        this.type = type;
+        this.marks = marks;
     }
 
     // Getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getId() {
-        return id;
-    }
+    public int getExamId() { return examId; }
+    public void setExamId(int examId) { this.examId = examId; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getQuestionText() { return questionText; }
+    public void setQuestionText(String questionText) { this.questionText = questionText; }
 
-    public String getQuestionText() {
-        return questionText;
-    }
+    public int getMarks() { return marks; }
+    public void setMarks(int marks) { this.marks = marks; }
 
-    public void setQuestionText(String questionText)
-    {
-        this.questionText = questionText;
-    }
-
-    public String getCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public void setCorrectAnswer(String correctAnswer) {
-        this.correctAnswer = correctAnswer;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    public String getCorrectAnswer() { return correctAnswer; }
+    public void setCorrectAnswer(String correctAnswer) { this.correctAnswer = correctAnswer; }
 }
