@@ -1,6 +1,4 @@
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -45,30 +43,8 @@ public class UserRegistrationGUI extends Application {
         roleChoiceBox.getItems().addAll("student", "teacher");
         GridPane.setConstraints(roleChoiceBox, 1, 4);
 
-        // Additional fields for students
-        Label yearOfStudyLabel = new Label("Year of Study:");
-        GridPane.setConstraints(yearOfStudyLabel, 0, 5);
-        TextField yearOfStudyInput = new TextField();
-        GridPane.setConstraints(yearOfStudyInput, 1, 5);
-
-        Label majorLabel = new Label("Major:");
-        GridPane.setConstraints(majorLabel, 0, 6);
-        TextField majorInput = new TextField();
-        GridPane.setConstraints(majorInput, 1, 6);
-
-        // Additional fields for teachers
-        Label departmentLabel = new Label("Department:");
-        GridPane.setConstraints(departmentLabel, 0, 5);
-        TextField departmentInput = new TextField();
-        GridPane.setConstraints(departmentInput, 1, 5);
-
-        Label yearsOfExperienceLabel = new Label("Years of Experience:");
-        GridPane.setConstraints(yearsOfExperienceLabel, 0, 6);
-        TextField yearsOfExperienceInput = new TextField();
-        GridPane.setConstraints(yearsOfExperienceInput, 1, 6);
-
         Button registerButton = new Button("Register");
-        GridPane.setConstraints(registerButton, 1, 7);
+        GridPane.setConstraints(registerButton, 1, 5);
 
         registerButton.setOnAction(e -> {
             String firstName = firstNameInput.getText();
@@ -85,55 +61,18 @@ public class UserRegistrationGUI extends Application {
             String username = lastName + firstName + role + "@school.ac.za";
 
             try {
-                if (role.equals("student")) {
-                    String yearOfStudy = yearOfStudyInput.getText();
-                    String major = majorInput.getText();
-                    if (yearOfStudy.isEmpty() || major.isEmpty()) {
-                        showAlert(Alert.AlertType.ERROR, "Form Error!", "Please enter all fields for student");
-                        return;
-                    }
-                    Student student = new Student(0, firstName, lastName, email, password,
-                            Integer.parseInt(yearOfStudy), major);
-                    Database.addUser(student, role);
-                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful!",
-                            "Welcome, " + student.getFirstName() + ". Use this username to log in the system: "
-                                    + username);
-                } else if (role.equals("teacher")) {
-                    String department = departmentInput.getText();
-                    String yearsOfExperience = yearsOfExperienceInput.getText();
-                    if (department.isEmpty() || yearsOfExperience.isEmpty()) {
-                        showAlert(Alert.AlertType.ERROR, "Form Error!",
-                                "Please enter all fields for teacher");
-                        return;
-                    }
-                    Teacher teacher = new Teacher(0, firstName, lastName, email, password, department,
-                            Integer.parseInt(yearsOfExperience));
-                    Database.addUser(teacher, role);
-                    showAlert(Alert.AlertType.INFORMATION, "Registration Successful!",
-                            "Welcome, " + teacher.getFirstName());
-                }
+                User user = new User(0, firstName, lastName, email, password, role);
+                Database.addUser(user);
+                showAlert(Alert.AlertType.INFORMATION, "Registration Successful!",
+                        "Welcome, " + user.getFirstName() + ". Use this username to log in the system: " + username);
             } catch (SQLException ex) {
-                showAlert(Alert.AlertType.ERROR, "Registration Error!",
-                        "An error occurred: " + ex.getMessage());
+                showAlert(Alert.AlertType.ERROR, "Registration Error!", "An error occurred: " + ex.getMessage());
             }
         });
 
         grid.getChildren().addAll(firstNameLabel, firstNameInput, lastNameLabel, lastNameInput, emailLabel, emailInput, passwordLabel, passwordInput, roleLabel, roleChoiceBox, registerButton);
 
-        roleChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                if (newValue.equals("student")) {
-                    grid.getChildren().removeAll(departmentLabel, departmentInput, yearsOfExperienceLabel, yearsOfExperienceInput);
-                    grid.getChildren().addAll(yearOfStudyLabel, yearOfStudyInput, majorLabel, majorInput);
-                } else if (newValue.equals("teacher")) {
-                    grid.getChildren().removeAll(yearOfStudyLabel, yearOfStudyInput, majorLabel, majorInput);
-                    grid.getChildren().addAll(departmentLabel, departmentInput, yearsOfExperienceLabel, yearsOfExperienceInput);
-                }
-            }
-        });
-
-        Scene scene = new Scene(grid, 400, 400);
+        Scene scene = new Scene(grid, 300, 250);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
