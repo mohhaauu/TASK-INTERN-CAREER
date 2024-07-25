@@ -1,52 +1,54 @@
-import java.util.List;
-
 public class Exam {
     private int id;
+    private int teacherId;
     private String title;
     private int duration;
-    private int teacherId;
-    private List<Questions> questions;
 
-    public Exam(int id, String title, int duration, int teacherId, List<Questions> questions) {
-        this.id = id;
+    // Constructor
+    public Exam(int teacherId, String title, int duration) {
+        this.teacherId = teacherId;
         this.title = title;
         this.duration = duration;
-        this.teacherId = teacherId;
-        this.questions = questions;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-    public void setTeacherId(int teacherId) {
-        this.teacherId = teacherId;
-    }
-    public void setQuestions(List<Questions> questions) {
-        this.questions = questions;
-    }
-    public int getId() {
+    // Getters and setters
+    public int getId()
+    {
         return id;
     }
 
-    public String getTitle() {
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public int getTeacherId()
+    {
+        return teacherId;
+    }
+    
+    public void setTeacherId(int teacherId)
+    {
+        this.teacherId = teacherId;
+    }
+
+    public String getTitle()
+    {
         return title;
     }
 
-    public int getDuration() {
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public int getDuration()
+    {
         return duration;
     }
 
-    public int getTeacherId() {
-        return teacherId;
-    }
-
-    public List<Questions> getQuestions() {
-        return questions;
+    public void setDuration(int duration)
+    {
+        this.duration = duration;
     }
 }
