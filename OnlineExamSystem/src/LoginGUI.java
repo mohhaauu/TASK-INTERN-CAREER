@@ -8,8 +8,13 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.List;
 
-public class LoginGUI extends Application {
+public class LoginGUI extends Application 
+{
+    private static User user; // Static variable to hold the user data
 
+    public static void setUser(User user) {
+        LoginGUI.user = user;
+    }
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("User Login");
@@ -67,7 +72,6 @@ public class LoginGUI extends Application {
     }
 
     private void selectExamForStudent(int studentId) {
-        // This method should show a selection dialog for exams
         Stage examSelectionStage = new Stage();
         examSelectionStage.setTitle("Select Exam");
 
@@ -85,26 +89,29 @@ public class LoginGUI extends Application {
         try {
             List<Integer> examIds = Database.getAllExamIds();
             examComboBox.getItems().addAll(examIds);
-        } catch (SQLException ex) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load exams: " + ex.getMessage());
-            return;
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to load exams: " + e.getMessage());
         }
 
-        Button proceedButton = new Button("Proceed");
-        GridPane.setConstraints(proceedButton, 1, 1);
+        Button startExamButton = new Button("Start Exam");
+        GridPane.setConstraints(startExamButton, 1, 1);
 
-        proceedButton.setOnAction(e -> {
+        startExamButton.setOnAction(e -> {
             Integer selectedExamId = examComboBox.getValue();
             if (selectedExamId != null) {
-                ExamTaking examGUI = new ExamTaking(studentId, selectedExamId);
-                examGUI.start(new Stage());
-                examSelectionStage.close();
+                ExamTaking examTaking = new ExamTaking(user.getId(), selectedExamId);
+                try {
+                    examTaking.start(new Stage());
+                } catch (Exception ee) {
+                    showAlert(Alert.AlertType.ERROR, "Exam Error", "Failed to start the exam: " +
+                            ee.getMessage());
+                }
             } else {
                 showAlert(Alert.AlertType.ERROR, "Selection Error", "Please select an exam.");
             }
         });
 
-        grid.getChildren().addAll(selectExamLabel, examComboBox, proceedButton);
+        grid.getChildren().addAll(selectExamLabel, examComboBox, startExamButton);
 
         Scene scene = new Scene(grid, 300, 150);
         examSelectionStage.setScene(scene);
