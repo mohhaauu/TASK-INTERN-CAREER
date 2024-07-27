@@ -10,55 +10,54 @@ public class Database {
     public static void addUser(User user) throws SQLException {
         String query = "INSERT INTO users (first_name, last_name, email, password, role) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, user.getFirstName());
-            stmt.setString(2, user.getLastName());
-            stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPassword());
-            stmt.setString(5, user.getRole());
-            stmt.executeUpdate();
+             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, user.getFirstName());
+            pstmt.setString(2, user.getLastName());
+            pstmt.setString(3, user.getEmail());
+            pstmt.setString(4, user.getPassword());
+            pstmt.setString(5, user.getRole());
+            pstmt.executeUpdate();
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    user.setId(generatedKeys.getInt(1));
-                }
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                user.setId(rs.getInt(1));
             }
         }
     }
 
-    public static User validateLogin(String email, String password) throws SQLException {
+    public static User validateLogin(String email, String password) throws SQLException
+    {
         String query = "SELECT * FROM users WHERE email = ? AND password = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, email);
-            stmt.setString(2, password);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    int id = rs.getInt("id");
-                    String firstName = rs.getString("first_name");
-                    String lastName = rs.getString("last_name");
-                    String role = rs.getString("role");
-                    return new User(id, firstName, lastName, email, password, role);
-                }
+             PreparedStatement prepStm = conn.prepareStatement(query)) {
+            prepStm.setString(1, email);
+            prepStm.setString(2, password);
+            ResultSet rs = prepStm.executeQuery();
+            if (rs.next()) {
+                return new User(rs.getInt("user_id"), rs.getString("first_name"),
+                        rs.getString("last_name"),rs.getString("email"),
+                        rs.getString("password"), rs.getString("role"));
+            } else {
+                return null;
             }
         }
-        return null;
     }
 
-    public static void addExam(Exam exam) throws SQLException {
+    public static void addExam(int teacherId, String title, int duration) {
         String query = "INSERT INTO exams (teacher_id, title, duration) VALUES (?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, exam.getTeacherId());
-            stmt.setString(2, exam.getTitle());
-            stmt.setInt(3, exam.getDuration());
-            stmt.executeUpdate();
+             PreparedStatement statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setInt(1, teacherId);
+            statement.setString(2, title);
+            statement.setInt(3, duration);
+            statement.executeUpdate();
 
-            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    exam.setId(generatedKeys.getInt(1));
-                }
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                generatedKeys.getInt(1);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -126,15 +125,15 @@ public class Database {
         String query = "INSERT INTO exam_results (student_id, exam_id, total_marks, feedback) VALUES (?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, result.getStudentID());
-            stmt.setInt(2, result.getExamID());
+            stmt.setInt(1, result.getStudentId());
+            stmt.setInt(2, result.getExamId());
             stmt.setInt(3, result.getTotalMarks());
             stmt.setString(4, result.getFeedback());
             stmt.executeUpdate();
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    result.setExamResultID(generatedKeys.getInt(1));
+                    result.setId(generatedKeys.getInt(1));
                 }
             }
         }
@@ -152,8 +151,14 @@ public class Database {
         return -1;
     }
 
-    public static void addQuestionToExam(int examId, Questions question) throws SQLException {
-        String query = "INSERT INTO questions (exam_id, question_text, marks, correct_answer) VALUES (?, ?, ?, ?)";
+    public static void addQuestionToExam(int examId, Questions question) throws SQLException
+    {
+        if (!doesExamIdExist(examId)) {
+            System.err.println("Exam ID " + examId + " does not exist. Cannot add question.");
+            return;
+        }
+
+        String query = "INSERT INTO questions (exam_id, question_text, mark, correct_answer) VALUES (?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, examId);
@@ -161,29 +166,26 @@ public class Database {
             stmt.setInt(3, question.getMarks());
             stmt.setString(4, question.getCorrectAnswer());
             stmt.executeUpdate();
+
+
         }
     }
 
     public static List<Questions> getQuestionsByExamId(int examId) throws SQLException {
         String query = "SELECT * FROM questions WHERE exam_id = ?";
-        List<Questions> questions = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, examId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Questions question = new Questions(
-                            rs.getInt("exam_id"),
-                            rs.getString("question_text"),
-                            rs.getString("correct_answer"),
-                            rs.getInt("marks")
-                    );
-                    question.setId(rs.getInt("id"));
-                    questions.add(question);
-                }
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, examId);
+            ResultSet rs = pstmt.executeQuery();
+            List<Questions> questions = new ArrayList<>();
+            while (rs.next()) {
+                Questions question = new Questions(rs.getInt("exam_id"), rs.getString("question_text"),
+                        rs.getString("correct_answer"), rs.getInt("mark"));
+                question.setId(rs.getInt("question_id"));
+                questions.add(question);
             }
+            return questions;
         }
-        return questions;
     }
 
     public static int getExamDurationById(int examId) throws SQLException {
@@ -201,13 +203,92 @@ public class Database {
     }
 
     public static void saveStudentExam(StudentExam studentExam) throws SQLException {
-        String query = "INSERT INTO student_exams (student_id, exam_id, start_time, end_time) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO student_exams (student_id, exam_id, start_time, end_time, status) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, studentExam.getStudentId());
-            stmt.setInt(2, studentExam.getExamId());
-            stmt.setInt(3, studentExam.getScore());
-            stmt.executeUpdate();
+             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, studentExam.getStudentId());
+            pstmt.setInt(2, studentExam.getExamId());
+            pstmt.setTimestamp(3, new Timestamp(studentExam.getStartTime().getTime()));
+            pstmt.setTimestamp(4, studentExam.getEndTime() != null ?
+                                new Timestamp(studentExam.getEndTime().getTime()) : null);
+            pstmt.setString(5, studentExam.getStatus());
+            pstmt.executeUpdate();
+
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                studentExam.setId(rs.getInt(1));
+            }
         }
+    }
+
+    public static void saveExamResults(ExamResult examResults) throws SQLException {
+        String sql = "INSERT INTO exam_results (student_id, exam_id, feedback) VALUES (?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement prepStatement = conn.prepareStatement(sql)) {
+            prepStatement.setInt(1, examResults.getStudentId());
+            prepStatement.setInt(2, examResults.getExamId());
+            prepStatement.setString(3, examResults.getFeedback());
+            prepStatement.executeUpdate();
+        }
+    }
+
+    public static Exam getExamById(int examId) throws SQLException {
+        String query = "SELECT * FROM exams WHERE exam_id = ?";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, examId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new Exam(rs.getInt("exam_id"), rs.getInt("teacher_id"),
+                        rs.getString("title"), rs.getInt("duration"));
+            } else {
+                throw new SQLException("Exam not found");
+            }
+        }
+    }
+
+    public static void saveStudentAnswer(StudentAnswer studentAnswer) throws SQLException {
+        String query = "INSERT INTO student_answers (student_id, question_id, answer, mark) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, studentAnswer.getStudentId());
+            pstmt.setInt(2, studentAnswer.getQuestionId());
+            pstmt.setString(3, studentAnswer.getAnswer());
+            pstmt.setInt(4, studentAnswer.getMark());
+            pstmt.executeUpdate();
+
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                studentAnswer.setId(rs.getInt(1));
+            }
+        }
+    }
+
+    public static List<Integer> getAllExamIds() throws SQLException {
+        String query = "SELECT exam_id FROM exams";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+            List<Integer> examIds = new ArrayList<>();
+            while (rs.next()) {
+                examIds.add(rs.getInt("exam_id"));
+            }
+            return examIds;
+        }
+    }
+
+    public static boolean doesExamIdExist(int examId) {
+        String query = "SELECT COUNT(*) FROM exams WHERE exam_id = ?";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.setInt(1, examId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
