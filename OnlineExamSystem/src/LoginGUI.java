@@ -8,13 +8,13 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.List;
 
-public class LoginGUI extends Application 
-{
-    private static User user; // Static variable to hold the user data
+public class LoginGUI extends Application {
+    private User user; // Instance variable to hold the user data
 
-    public static void setUser(User user) {
-        LoginGUI.user = user;
+    public void setUser(User user) {
+        this.user = user;
     }
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("User Login");
@@ -49,6 +49,7 @@ public class LoginGUI extends Application
             try {
                 User user = Database.validateLogin(email, password);
                 if (user != null) {
+                    setUser(user); // Set the user
                     if (user.getRole().equals("student")) {
                         selectExamForStudent(user.getId());
                     } else if (user.getRole().equals("teacher")) {
@@ -99,12 +100,11 @@ public class LoginGUI extends Application
         startExamButton.setOnAction(e -> {
             Integer selectedExamId = examComboBox.getValue();
             if (selectedExamId != null) {
-                ExamTaking examTaking = new ExamTaking(user.getId(), selectedExamId);
+                ExamTaking examTaking = new ExamTaking(studentId, selectedExamId);
                 try {
                     examTaking.start(new Stage());
                 } catch (Exception ee) {
-                    showAlert(Alert.AlertType.ERROR, "Exam Error", "Failed to start the exam: " +
-                            ee.getMessage());
+                    showAlert(Alert.AlertType.ERROR, "Exam Error", "Failed to start the exam: " + ee.getMessage());
                 }
             } else {
                 showAlert(Alert.AlertType.ERROR, "Selection Error", "Please select an exam.");
