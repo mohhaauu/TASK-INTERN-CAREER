@@ -1,11 +1,14 @@
-public class Exam {
+public class Exam
+{
     private int id;
     private int teacherId;
     private String title;
     private int duration;
 
     // Constructor
-    public Exam(int teacherId, String title, int duration) {
+    public Exam(int id, int teacherId, String title, int duration)
+    {
+        this.id = id;
         this.teacherId = teacherId;
         this.title = title;
         this.duration = duration;
@@ -26,7 +29,7 @@ public class Exam {
     {
         return teacherId;
     }
-    
+
     public void setTeacherId(int teacherId)
     {
         this.teacherId = teacherId;

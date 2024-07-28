@@ -1,12 +1,13 @@
-public class Questions {
+public class Questions
+{
     private int id;
     private int examId;
     private String questionText;
-    private int marks;
     private String correctAnswer;
+    private int marks;
 
-    // Constructor
-    public Questions(int examId, String questionText, String correctAnswer, int marks) {
+    public Questions(int id, int examId, String questionText, String correctAnswer, int marks) {
+        this.id = id;
         this.examId = examId;
         this.questionText = questionText;
         this.correctAnswer = correctAnswer;
