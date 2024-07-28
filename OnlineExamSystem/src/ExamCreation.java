@@ -7,16 +7,19 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
-public class ExamCreation extends Application {
+public class ExamCreation extends Application
+{
     private int currentExamId = -1;
     private int teacherId;
 
-    public ExamCreation(int teacherId) {
+    public ExamCreation(int teacherId)
+    {
         this.teacherId = teacherId;
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws SQLException
+    {
         primaryStage.setTitle("Create Exam");
 
         GridPane grid = new GridPane();
@@ -55,17 +58,19 @@ public class ExamCreation extends Application {
         Button addQuestionButton = new Button("Add Question");
         GridPane.setConstraints(addQuestionButton, 1, 6);
 
-        createExamButton.setOnAction(e -> {
-            try {
+        createExamButton.setOnAction(e ->
+        {
+            try
+            {
                 String title = titleInput.getText();
                 int duration = Integer.parseInt(durationInput.getText());
-                Exam exam = new Exam(0, teacherId, title, duration); // Assuming the first parameter is an ID
                 Database.addExam(teacherId, title, duration);
                 currentExamId = Database.getLastInsertedExamId();
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Exam created successfully with ID: " + currentExamId);
                 alert.show();
-            } catch (SQLException ex) {
+            } catch (SQLException ex)
+            {
                 ex.printStackTrace();
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setContentText("Failed to create exam.");
@@ -73,9 +78,12 @@ public class ExamCreation extends Application {
             }
         });
 
-        addQuestionButton.setOnAction(e -> {
-            try {
-                if (currentExamId == -1) {
+        addQuestionButton.setOnAction(e ->
+        {
+            try
+            {
+                if (currentExamId == -1)
+                {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setContentText("Please create an exam first.");
                     alert.show();
@@ -84,12 +92,14 @@ public class ExamCreation extends Application {
                 String questionText = questionInput.getText();
                 String correctAnswer = answerInput.getText();
                 int marks = Integer.parseInt(marksInput.getText());
-                Questions question = new Questions(currentExamId, questionText, correctAnswer, marks);
+                Questions question = new Questions(0, currentExamId, questionText, correctAnswer, marks);
                 Database.addQuestionToExam(currentExamId, question);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Question added successfully.");
                 alert.show();
-            } catch (SQLException ex) {
+            }
+            catch (SQLException ex)
+            {
                 ex.printStackTrace();
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setContentText("Failed to add question.");
@@ -104,7 +114,8 @@ public class ExamCreation extends Application {
         primaryStage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         launch(args);
     }
 }

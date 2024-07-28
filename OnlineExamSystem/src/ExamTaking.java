@@ -1,29 +1,32 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class ExamTaking extends Application {
+public class ExamTaking extends Application
+{
     private final int studentId;
     private final int examId;
     private List<Questions> questions;
     private Timer timer;
     private int remainingTime; // in seconds
 
-    public ExamTaking(int studentId, int examId) {
+    public ExamTaking(int studentId, int examId)
+    {
         this.studentId = studentId;
         this.examId = examId;
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         primaryStage.setTitle("Take Exam");
 
         GridPane grid = new GridPane();
@@ -32,21 +35,33 @@ public class ExamTaking extends Application {
         grid.setHgap(10);
 
         Exam exam = null;
-        try {
+        try
+        {
             exam = Database.getExamById(examId);
             questions = Database.getQuestionsByExamId(examId);
+
+            if (questions.isEmpty())
+            {
+                showAlert(Alert.AlertType.ERROR, "No Questions", "No questions found for this exam.");
+                return;
+            }
+
             remainingTime = exam.getDuration() * 60; // Convert minutes to seconds
-        } catch (SQLException ex) {
+
+        } catch (SQLException ex)
+        {
+            ex.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to load exam: " + ex.getMessage());
             return;
         }
 
-        Label examTitleLabel = new Label("Exam: " + examId);
+        Label examTitleLabel = new Label("Exam: " + exam.getTitle());
         GridPane.setConstraints(examTitleLabel, 0, 0);
         grid.getChildren().add(examTitleLabel);
 
         int row = 1;
-        for (Questions question : questions) {
+        for (Questions question : questions)
+        {
             Label questionLabel = new Label(question.getQuestionText());
             GridPane.setConstraints(questionLabel, 0, row);
             grid.getChildren().add(questionLabel);
@@ -60,11 +75,11 @@ public class ExamTaking extends Application {
         }
 
         Label timerLabel = new Label();
-        GridPane.setConstraints(timerLabel, 1, questions.size() * 2);
+        GridPane.setConstraints(timerLabel, 1, row);
         grid.getChildren().add(timerLabel);
 
         Button submitButton = new Button("Submit");
-        GridPane.setConstraints(submitButton, 1, questions.size() * 2 + 1);
+        GridPane.setConstraints(submitButton, 1, row + 1);
         submitButton.setOnAction(e -> submitExam(primaryStage));
 
         grid.getChildren().add(submitButton);
@@ -75,49 +90,69 @@ public class ExamTaking extends Application {
         startTimer(timerLabel, primaryStage);
     }
 
-    private void startTimer(Label timerLabel, Stage primaryStage) {
+    private void startTimer(Label timerLabel, Stage primaryStage)
+    {
         timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 remainingTime--;
                 int minutes = remainingTime / 60;
                 int seconds = remainingTime % 60;
-                timerLabel.setText(String.format("Time Remaining: %02d:%02d", minutes, seconds));
 
-                if (remainingTime <= 0) {
+                Platform.runLater(() -> timerLabel.setText(String.format("Time Remaining: %02d:%02d", minutes,
+                                    seconds)));
+
+                if (remainingTime <= 0)
+                {
                     timer.cancel();
-                    submitExam(primaryStage);
+                    Platform.runLater(() -> submitExam(primaryStage));
                 }
             }
         }, 0, 1000);
     }
 
-    private void submitExam(Stage primaryStage) {
-        timer.cancel();
+    private void submitExam(Stage primaryStage)
+    {
+        if (timer != null)
+        {
+            timer.cancel();
+        }
 
         // Collect answers and calculate score
         int score = 0;
         int totalMarks = 0;
         StringBuilder feedback = new StringBuilder();
-        for (Questions question : questions) {
+        for (Questions question : questions)
+        {
             TextField answerInput = (TextField) primaryStage.getScene().lookup("#question-" + question.getId());
-            if (answerInput != null) {
+            if (answerInput != null)
+            {
                 String answer = answerInput.getText();
                 totalMarks += question.getMarks(); // Accumulate total marks
-                if (question.getCorrectAnswer().equals(answer)) {
+                if (question.getCorrectAnswer().equals(answer))
+                {
                     score += question.getMarks(); // Add question marks to score if correct
-                    feedback.append("Question ").append(question.getId()).append(": Correct (Marks: ").append(question.getMarks()).append(")\n");
-                } else {
-                    feedback.append("Question ").append(question.getId()).append(": Incorrect (Correct Answer: ").append(question.getCorrectAnswer()).append(")\n");
+                    feedback.append("Question ").append(question.getId()).append(": Correct (Marks: "
+                                                                            ).append(question.getMarks()).append(")\n");
+                } else
+                {
+                    feedback.append("Question ").append(question.getId()).append(": Incorrect (Correct Answer: "
+                                                                    ).append(question.getCorrectAnswer()).append(")\n");
                 }
 
                 // Instantiate and save StudentAnswer for each question
                 StudentAnswer studentAns = new StudentAnswer(studentId, question.getId(), answer, question.getMarks());
-                try {
+                try
+                {
                     Database.saveStudentAnswer(studentAns);
-                } catch (SQLException ex) {
-                    showAlert(Alert.AlertType.ERROR, "Submission Error", "An error occurred while saving answers: " + ex.getMessage());
+                } catch (SQLException ex)
+                {
+                    ex.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Submission Error", "An error occurred while " +
+                                "saving answers: " + ex.getMessage());
                 }
             }
         }
@@ -125,10 +160,13 @@ public class ExamTaking extends Application {
         // Create ExamResult object with the required parameters
         ExamResult examResults = new ExamResult(studentId, examId, totalMarks, feedback.toString());
 
-        try {
+        try
+        {
             Database.saveExamResults(examResults); // Save exam results to the database
             showAlert(Alert.AlertType.INFORMATION, "Exam Submitted", "Your score: " + score + " out of " + totalMarks + "\nFeedback:\n" + feedback);
-        } catch (SQLException ex) {
+        } catch (SQLException ex)
+        {
+            ex.printStackTrace(); // Log the stack trace for debugging
             showAlert(Alert.AlertType.ERROR, "Submission Error", "An error occurred: " + ex.getMessage());
         }
 
