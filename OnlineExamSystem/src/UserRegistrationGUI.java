@@ -6,10 +6,20 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 
-public class UserRegistrationGUI extends Application {
-
+/**
+ * The UserRegistrationGUI class provides a JavaFX application for user registration.
+ * This class allows users to enter their details and register as either a student or a teacher.
+ */
+public class UserRegistrationGUI extends Application
+{
+    /**
+     * Starts the JavaFX application, sets up the user interface, and handles user interactions.
+     *
+     * @param primaryStage The primary stage for this application.
+     */
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         primaryStage.setTitle("User Registration");
 
         GridPane grid = new GridPane();
@@ -58,14 +68,16 @@ public class UserRegistrationGUI extends Application {
                 return;
             }
 
-            String username = lastName + firstName + role + "@school.ac.za";
-
-            try {
+            try
+            {
                 User user = new User(0, firstName, lastName, email, password, role);
                 Database.addUser(user);
                 showAlert(Alert.AlertType.INFORMATION, "Registration Successful!",
-                        "Welcome, " + user.getFirstName() + ". Use this username to log in the system: " + username);
-            } catch (SQLException ex) {
+                        "Welcome, " + user.getFirstName() + ". Use your email and password to login.");
+                LoginGUI loginGUI = new LoginGUI();
+                loginGUI.start(new Stage());
+            } catch (SQLException ex)
+            {
                 showAlert(Alert.AlertType.ERROR, "Registration Error!", "An error occurred: " + ex.getMessage());
             }
         });
@@ -77,6 +89,13 @@ public class UserRegistrationGUI extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Shows an alert dialog with the specified type, title, and message.
+     *
+     * @param alertType The type of alert to display.
+     * @param title The title of the alert dialog.
+     * @param message The message to display in the alert dialog.
+     */
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
@@ -85,6 +104,11 @@ public class UserRegistrationGUI extends Application {
         alert.showAndWait();
     }
 
+    /**
+     * The main method to launch the JavaFX application.
+     *
+     * @param args The command line arguments.
+     */
     public static void main(String[] args) {
         launch(args);
     }
