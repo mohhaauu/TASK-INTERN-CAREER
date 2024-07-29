@@ -1,28 +1,39 @@
+/**
+ * This class represents an exam in the system.
+ */
 public class Exam
 {
-    private int id;
+    private int examId;
     private int teacherId;
     private String title;
     private int duration;
 
-    // Constructor
-    public Exam(int id, int teacherId, String title, int duration)
+    /**
+     * Constructor to initialize an exam.
+     *
+     * @param examId The ID of the exam.
+     * @param teacherId The ID of the teacher creating the exam.
+     * @param title The title of the exam.
+     * @param duration The duration of the exam in minutes.
+     */
+    public Exam(int examId, int teacherId, String title, int duration)
     {
-        this.id = id;
+        this.examId = examId;
         this.teacherId = teacherId;
         this.title = title;
         this.duration = duration;
     }
 
     // Getters and setters
-    public int getId()
+
+    public int getExamId()
     {
-        return id;
+        return examId;
     }
 
-    public void setId(int id)
+    public void setExamId(int examId)
     {
-        this.id = id;
+        this.examId = examId;
     }
 
     public int getTeacherId()

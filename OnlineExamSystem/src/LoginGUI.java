@@ -8,15 +8,33 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.List;
 
-public class LoginGUI extends Application {
-    private User user; // Instance variable to hold the user data
+/**
+ * A JavaFX application for user login and exam selection.
+ * This application provides a login interface and, based on the user's role,
+ * either allows students to select an exam or provides an interface for teachers to create an exam.
+ */
+public class LoginGUI extends Application
+{
+    private User user;
 
-    public void setUser(User user) {
+    /**
+     * Sets the user data for the login session.
+     *
+     * @param user the User object to set
+     */
+    public void setUser(User user)
+    {
         this.user = user;
     }
 
+    /**
+     * Initializes and shows the login UI for the application.
+     *
+     * @param primaryStage the primary stage for this application
+     */
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         primaryStage.setTitle("User Login");
 
         GridPane grid = new GridPane();
@@ -72,6 +90,11 @@ public class LoginGUI extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Displays the exam selection UI for a student to choose and start an exam.
+     *
+     * @param studentId the ID of the student selecting the exam
+     */
     private void selectExamForStudent(int studentId) {
         Stage examSelectionStage = new Stage();
         examSelectionStage.setTitle("Select Exam");
@@ -104,9 +127,12 @@ public class LoginGUI extends Application {
                 try {
                     examTaking.start(new Stage());
                 } catch (Exception ee) {
-                    showAlert(Alert.AlertType.ERROR, "Exam Error", "Failed to start the exam: " + ee.getMessage());
+                    showAlert(Alert.AlertType.ERROR, "Exam Error", "Failed to start the exam: " +
+                            ee.getMessage());
                 }
-            } else {
+            }
+            else
+            {
                 showAlert(Alert.AlertType.ERROR, "Selection Error", "Please select an exam.");
             }
         });
@@ -118,7 +144,15 @@ public class LoginGUI extends Application {
         examSelectionStage.show();
     }
 
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
+    /**
+     * Shows an alert dialog with the specified type, title, and message.
+     *
+     * @param alertType the type of alert to show
+     * @param title the title of the alert
+     * @param message the content of the alert
+     */
+    private void showAlert(Alert.AlertType alertType, String title, String message)
+    {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
@@ -126,7 +160,13 @@ public class LoginGUI extends Application {
         alert.showAndWait();
     }
 
-    public static void main(String[] args) {
+    /**
+     * Launches the application.
+     *
+     * @param args command line arguments
+     */
+    public static void main(String[] args)
+    {
         launch(args);
     }
 }

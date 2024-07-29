@@ -7,16 +7,31 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+/**
+ * The ExamCreation class provides a JavaFX application for creating exams and adding questions to them.
+ * This class allows teachers to create a new exam and add questions to it via a graphical user interface.
+ */
 public class ExamCreation extends Application
 {
     private int currentExamId = -1;
     private int teacherId;
 
+    /**
+     * Constructor for ExamCreation.
+     *
+     * @param teacherId The ID of the teacher creating the exam.
+     */
     public ExamCreation(int teacherId)
     {
         this.teacherId = teacherId;
     }
 
+    /**
+     * Starts the JavaFX application, sets up the user interface, and handles user interactions.
+     *
+     * @param primaryStage The primary stage for this application.
+     * @throws SQLException if a database access error occurs.
+     */
     @Override
     public void start(Stage primaryStage) throws SQLException
     {
@@ -92,7 +107,7 @@ public class ExamCreation extends Application
                 String questionText = questionInput.getText();
                 String correctAnswer = answerInput.getText();
                 int marks = Integer.parseInt(marksInput.getText());
-                Questions question = new Questions(0, currentExamId, questionText, correctAnswer, marks);
+                Questions question = new Questions(0, currentExamId, questionText, marks, correctAnswer);
                 Database.addQuestionToExam(currentExamId, question);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("Question added successfully.");
@@ -114,6 +129,11 @@ public class ExamCreation extends Application
         primaryStage.show();
     }
 
+    /**
+     * The main method to launch the JavaFX application.
+     *
+     * @param args The command line arguments.
+     */
     public static void main(String[] args)
     {
         launch(args);

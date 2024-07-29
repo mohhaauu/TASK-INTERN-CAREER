@@ -1,3 +1,6 @@
+/**
+ * This class represents the result of an exam taken by a student.
+ */
 public class ExamResult
 {
     private int id;
@@ -6,7 +9,14 @@ public class ExamResult
     private int totalMarks;
     private String feedback;
 
-    // Constructor
+    /**
+     * Constructor to initialize an exam result.
+     *
+     * @param studentId The ID of the student.
+     * @param examId The ID of the exam.
+     * @param totalMarks The total marks obtained by the student.
+     * @param feedback The feedback given to the student.
+     */
     public ExamResult(int studentId, int examId, int totalMarks, String feedback)
     {
         this.studentId = studentId;
@@ -16,6 +26,7 @@ public class ExamResult
     }
 
     // Getters and setters
+
     public int getId()
     {
         return id;
